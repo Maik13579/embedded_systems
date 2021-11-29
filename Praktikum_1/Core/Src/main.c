@@ -321,7 +321,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 //
 //		//enable interrupt
 //		HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-		taster_1_blocked = false;
+		taster_1_blocked = 0;
 
 	}
 }
@@ -341,7 +341,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 //		HAL_TIM_Base_Start_IT(&htim16);
 
 		if(!taster_1_blocked){
-			taster_1_blocked = true;
+			taster_1_blocked = 1;
 			counter++;
 		}
 	}
