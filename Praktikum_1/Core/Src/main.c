@@ -106,30 +106,6 @@ int main(void)
 
   while (1)
   {
-//	  // press taster
-//	  if(HAL_GPIO_ReadPin(Taster_1_GPIO_Port, Taster_1_Pin)){
-//			  HAL_GPIO_WritePin(LD2_GPIO_Port, GPIO_PIN_5, GPIO_PIN_RESET);
-//			  if(counter_1<=(1000/delay)) counter_1 = 0; //reset counter if its not longer pressed than 1 sec
-//
-//		  }else{
-//			  HAL_GPIO_WritePin(LD2_GPIO_Port, GPIO_PIN_5, GPIO_PIN_SET);
-//			  counter_1++; //inc counter
-//		  }
-//
-//	  //hold taster for over 1 sec
-//	  if(counter_1>(1000/delay)){
-//		  HAL_GPIO_WritePin(LD2_GPIO_Port, GPIO_PIN_5, GPIO_PIN_SET);
-//	  }
-//
-//
-//	  //RESET Blue Button B1
-//	  if(!HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)){
-//		  HAL_GPIO_WritePin(LD2_GPIO_Port, GPIO_PIN_5, GPIO_PIN_RESET);
-//		  counter_1 = 0;
-//	  }
-//
-//	  printf("%u",counter_1);
-//	  HAL_Delay(delay);
 
     /* USER CODE END WHILE */
 
@@ -199,11 +175,14 @@ static void MX_TIM16_Init(void)
 
   /* USER CODE BEGIN TIM16_Init 1 */
 
+//80MHz / 8000 = 10 kHz -> 1 tick every 0.0001 sec
+//0.0001 sec * 100 = 0.01 sec -> timer interrupt every 10 ms
+
   /* USER CODE END TIM16_Init 1 */
   htim16.Instance = TIM16;
-  htim16.Init.Prescaler = 6000;
+  htim16.Init.Prescaler = 8000-1;
   htim16.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim16.Init.Period = 100000;
+  htim16.Init.Period = 100-1;
   htim16.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim16.Init.RepetitionCounter = 0;
   htim16.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -268,10 +247,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LED_green_Pin|LED_yellow_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_red_GPIO_Port, LED_red_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -279,18 +261,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : Taster_1_Pin */
-  GPIO_InitStruct.Pin = Taster_1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(Taster_1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : LED_1_Pin */
-  GPIO_InitStruct.Pin = LED_1_Pin;
+  /*Configure GPIO pins : LED_green_Pin LED_yellow_Pin */
+  GPIO_InitStruct.Pin = LED_green_Pin|LED_yellow_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : Button_down_Pin Button_up_Pin */
+  GPIO_InitStruct.Pin = Button_down_Pin|Button_up_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD2_Pin */
   GPIO_InitStruct.Pin = LD2_Pin;
@@ -299,51 +281,37 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+  /*Configure GPIO pin : LED_red_Pin */
+  GPIO_InitStruct.Pin = LED_red_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_red_GPIO_Port, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
 /* USER CODE BEGIN 4 */
+uint8_t button_state; //states for 8 buttons. bit = 1 -> button is pressed
+uint8_t counter0 =0xFF, counter1  =0xFF//8 * two bit counter
+uint8_t button_pin; //pins for 8 buttons
+
 //Callback: timer has reset
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim == &htim16){
-		//stop timer
-		HAL_TIM_Base_Stop(&htim16);
-//
-//		HAL_GPIO_TogglePin(LED_1_GPIO_Port, LED_1_Pin);
-//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-//
-//		//enable interrupt
-//		HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-		taster_1_blocked = 0;
+		uint8_t button_changed;
 
-	}
-}
-//Callback EXTI
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if(GPIO_Pin == Taster_1_Pin){
-//		//disable interrupt
-//		HAL_NVIC_DisableIRQ(EXTI0_IRQn);
-//
-//		//toggle led
-//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-//
-//		//inc counter
-//		counter++;
-//
+		if(HAL_GPIO_ReadPin(Button_up_GPIO_Port, Button_up_Pin)) button_pin |= (1<<0);
+		else button_pin &= ~(1<<0);
+		if(HAL_GPIO_ReadPin(Button_down_GPIO_Port, Button_down_Pin)) button_pin |= (1<<1);
+		else button_pin &= ~(1<<1);
 
-		if(!taster_1_blocked){
-			taster_1_blocked = 1;
-			//start timer
-			HAL_TIM_Base_Start_IT(&htim16);
-			counter++;
-		}
+		button_changed = button_state ^ button_pin; //bit = 1 -> button changed
+		counter0 = ~(counter0 & button_changed);
+		counter1 = counter0 ^ (counter1 & button_changed);
+
+		button_changed &= counter0 & counter1 //change button state only if timer rolls over!
+		key_state ^= button_changed; //toggle state
 	}
 }
 /* USER CODE END 4 */
