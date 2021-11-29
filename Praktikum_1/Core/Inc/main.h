@@ -80,6 +80,7 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 uint8_t counter;
+bool taster_1_blocked = false;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

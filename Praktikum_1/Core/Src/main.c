@@ -313,32 +313,37 @@ static void MX_GPIO_Init(void)
 //Callback: timer has reset
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim == &htim16){
-		//stop timer
-		HAL_TIM_Base_Stop(&htim16);
-
-		HAL_GPIO_TogglePin(LED_1_GPIO_Port, LED_1_Pin);
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-
-		//enable interrupt
-		HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
+//		//stop timer
+//		HAL_TIM_Base_Stop(&htim16);
+//
+//		HAL_GPIO_TogglePin(LED_1_GPIO_Port, LED_1_Pin);
+//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+//
+//		//enable interrupt
+//		HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+		taster_1_blocked = false;
 
 	}
 }
 //Callback EXTI
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == Taster_1_Pin){
-		//disable interrupt
-		HAL_NVIC_DisableIRQ(EXTI0_IRQn);
+//		//disable interrupt
+//		HAL_NVIC_DisableIRQ(EXTI0_IRQn);
+//
+//		//toggle led
+//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+//
+//		//inc counter
+//		counter++;
+//
+//		//start timer
+//		HAL_TIM_Base_Start_IT(&htim16);
 
-		//toggle led
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-
-		//inc counter
-		counter++;
-
-		//start timer
-		HAL_TIM_Base_Start_IT(&htim16);
+		if(!taster_1_blocked){
+			taster_1_blocked = true;
+			counter++;
+		}
 	}
 }
 /* USER CODE END 4 */
