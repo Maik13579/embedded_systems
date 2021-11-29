@@ -337,11 +337,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 //		//inc counter
 //		counter++;
 //
-		//start timer
-		HAL_TIM_Base_Start_IT(&htim16);
 
 		if(!taster_1_blocked){
 			taster_1_blocked = 1;
+			//start timer
+			HAL_TIM_Base_Start_IT(&htim16);
 			counter++;
 		}
 	}
