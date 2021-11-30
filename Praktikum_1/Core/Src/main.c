@@ -333,6 +333,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 
 		if(counter >= 10)HAL_GPIO_WritePin(LED_yellow_GPIO_Port, LED_yellow_Pin, GPIO_PIN_SET);
 		else HAL_GPIO_WritePin(LED_yellow_GPIO_Port, LED_yellow_Pin, GPIO_PIN_RESET);
+
+		if(counter >= 25)HAL_GPIO_WritePin(LED_green_GPIO_Port, LED_green_Pin, GPIO_PIN_SET);
+		else HAL_GPIO_WritePin(LED_green_GPIO_Port, LED_green_Pin, GPIO_PIN_RESET);
 	}
 }
 /* USER CODE END 4 */
