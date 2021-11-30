@@ -93,6 +93,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM16_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim16);
 
 
 
@@ -315,7 +316,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		button_changed &= counter0 & counter1; //change button state only if timer rolls over!
 		button_state ^= button_changed; //toggle state
 
-		if(button_state & 0b00000001) HAL_GPIO_TogglePin(LED_green_GPIO_Port, LED_green_Pin);
+		if(button_state & 0b00000001) HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+		else HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 	}
 }
 /* USER CODE END 4 */
