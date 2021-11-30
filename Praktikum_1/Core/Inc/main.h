@@ -83,7 +83,7 @@ void Error_Handler(void);
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-uint8_t counter;
+uint8_t counter, counter_up, counter_down;
 uint8_t taster_1_blocked;
 /* USER CODE END Private defines */
 

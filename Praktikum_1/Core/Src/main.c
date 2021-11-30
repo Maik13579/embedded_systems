@@ -95,11 +95,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim16);
 
-
-
-  uint8_t delay = 100;
-  uint8_t counter_1 = 0;
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -316,9 +311,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		button_changed &= counter0 & counter1; //change button state only if timer rolls over!
 		button_state ^= button_changed; //toggle state
 
-		if(button_state & button_changed & 0b00000001) counter++;
-		if(button_state & button_changed & 0b00000010 && counter > 0) counter--;
+		//count how long button up is pressed in 10 ms
+		if(button_state & 0b00000001) counter_up++;
 
+		//count how long button down is pressed in 10 ms
+		if(button_state & 0b00000010) counter_down++;
+
+		if(~button_state & button_changed &0b00000001){// stopped pressing button up
+			counter += (counter_up >= 100) ? 10 : 1; //increase counter with 10 if button is pressed longer than 1 sec, else increase 1
+			counter_up = 0; //reset counter
+		}
+
+		if(~button_state & button_changed &0b00000010){// stopped pressing button down
+			counter -= (counter_down >= 100) ? 10 : 1; //decrease counter with 10 if button is pressed longer than 1 sec, else decrease 1
+			counter_down = 0; //reset counter
+		}
+
+		// turn on LEDs
 		if(counter >= 5)HAL_GPIO_WritePin(LED_red_GPIO_Port, LED_red_Pin, GPIO_PIN_SET);
 		else HAL_GPIO_WritePin(LED_red_GPIO_Port, LED_red_Pin, GPIO_PIN_RESET);
 
