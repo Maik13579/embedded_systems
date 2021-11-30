@@ -316,8 +316,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		button_changed &= counter0 & counter1; //change button state only if timer rolls over!
 		button_state ^= button_changed; //toggle state
 
-		if(button_state & 0b00000001) HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-		else HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+		if(button_state & button_changed & 0b00000001) counter++;
+
+		if(counter >= 10)HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 	}
 }
 /* USER CODE END 4 */
