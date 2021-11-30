@@ -319,8 +319,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		if(button_state & button_changed & 0b00000001) counter++;
 		if(button_state & button_changed & 0b00000010 && counter > 0) counter--;
 
-		if(counter >= 10)HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-		else HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+		if(counter >= 5)HAL_GPIO_WritePin(LED_red_GPIO_Port, LED_red_Pin, GPIO_PIN_SET);
+		else HAL_GPIO_WritePin(LED_red_GPIO_Port, LED_red_Pin, GPIO_PIN_RESET);
+
+		if(counter >= 10)HAL_GPIO_WritePin(LED_yellow_GPIO_Port, LED_yellow_Pin, GPIO_PIN_SET);
+		else HAL_GPIO_WritePin(LED_yellow_GPIO_Port, LED_yellow_Pin, GPIO_PIN_RESET);
 	}
 }
 /* USER CODE END 4 */
