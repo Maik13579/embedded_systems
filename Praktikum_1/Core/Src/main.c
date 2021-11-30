@@ -102,6 +102,15 @@ int main(void)
 
   while (1)
   {
+	// turn on LEDs
+	if(counter >= 5)HAL_GPIO_WritePin(LED_red_GPIO_Port, LED_red_Pin, GPIO_PIN_SET);
+	else HAL_GPIO_WritePin(LED_red_GPIO_Port, LED_red_Pin, GPIO_PIN_RESET);
+
+	if(counter >= 10)HAL_GPIO_WritePin(LED_yellow_GPIO_Port, LED_yellow_Pin, GPIO_PIN_SET);
+	else HAL_GPIO_WritePin(LED_yellow_GPIO_Port, LED_yellow_Pin, GPIO_PIN_RESET);
+
+	if(counter >= 25)HAL_GPIO_WritePin(LED_green_GPIO_Port, LED_green_Pin, GPIO_PIN_SET);
+	else HAL_GPIO_WritePin(LED_green_GPIO_Port, LED_green_Pin, GPIO_PIN_RESET);
 
     /* USER CODE END WHILE */
 
@@ -292,6 +301,11 @@ uint8_t button_state; //states for 8 buttons. bit = 1 -> button is pressed
 uint8_t counter0 =0xFF, counter1  =0xFF;//8 * two bit counter
 uint8_t button_pin; //pins for 8 buttons
 
+// same like above only for 4x4 button matrix
+uint16_t counter0_matrix =0xFF, counter1_matrix= 0xFF;
+uint16_t matrix_state;
+uint16_t matrix_pin;
+
 //Callback: timer has reset
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim == &htim16){
@@ -327,16 +341,28 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 			counter_down = 0; //reset counter
 		}
 
-		// turn on LEDs
-		if(counter >= 5)HAL_GPIO_WritePin(LED_red_GPIO_Port, LED_red_Pin, GPIO_PIN_SET);
-		else HAL_GPIO_WritePin(LED_red_GPIO_Port, LED_red_Pin, GPIO_PIN_RESET);
 
-		if(counter >= 10)HAL_GPIO_WritePin(LED_yellow_GPIO_Port, LED_yellow_Pin, GPIO_PIN_SET);
-		else HAL_GPIO_WritePin(LED_yellow_GPIO_Port, LED_yellow_Pin, GPIO_PIN_RESET);
 
-		if(counter >= 25)HAL_GPIO_WritePin(LED_green_GPIO_Port, LED_green_Pin, GPIO_PIN_SET);
-		else HAL_GPIO_WritePin(LED_green_GPIO_Port, LED_green_Pin, GPIO_PIN_RESET);
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////4X4 Button Matrix//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		uint16_t matrix_changed;
+
+		//Todo: read matrix into matrix_pin
+
+		matrix_changed = matrix_state ^ matrix_pin;
+		counter0_matrix = ~(counter0_matrix & matrix_changed);
+		counter1_matrix = counter0_matrix ^ (counter1_matrix & matrix_changed);
+
+		matrix_changed &= counter0_matrix & counter1_matrix;
+		matrix_state ^= matrix_changed;
+
+		printf(matrix_state);
 	}
+
 }
 /* USER CODE END 4 */
 
