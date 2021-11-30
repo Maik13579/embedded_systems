@@ -293,7 +293,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 /* USER CODE BEGIN 4 */
 uint8_t button_state; //states for 8 buttons. bit = 1 -> button is pressed
-uint8_t counter0 =0xFF, counter1  =0xFF//8 * two bit counter
+uint8_t counter0 =0xFF, counter1  =0xFF;//8 * two bit counter
 uint8_t button_pin; //pins for 8 buttons
 
 //Callback: timer has reset
@@ -301,17 +301,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim == &htim16){
 		uint8_t button_changed;
 
-		if(HAL_GPIO_ReadPin(Button_up_GPIO_Port, Button_up_Pin)) button_pin |= (1<<0);
+		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4)) button_pin |= (1<<0);
 		else button_pin &= ~(1<<0);
-		if(HAL_GPIO_ReadPin(Button_down_GPIO_Port, Button_down_Pin)) button_pin |= (1<<1);
+		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1)) button_pin |= (1<<1);
 		else button_pin &= ~(1<<1);
 
 		button_changed = button_state ^ button_pin; //bit = 1 -> button changed
+
+		// count to 4 or reset of button_changed != 1
 		counter0 = ~(counter0 & button_changed);
 		counter1 = counter0 ^ (counter1 & button_changed);
 
-		button_changed &= counter0 & counter1 //change button state only if timer rolls over!
-		key_state ^= button_changed; //toggle state
+		button_changed &= counter0 & counter1; //change button state only if timer rolls over!
+		button_state ^= button_changed; //toggle state
+
+		if(button_state & 0b00000001) HAL_GPIO_TogglePin(LED_green_GPIO_Port, LED_green_Pin);
 	}
 }
 /* USER CODE END 4 */
