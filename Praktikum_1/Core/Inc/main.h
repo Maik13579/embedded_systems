@@ -85,6 +85,9 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 uint8_t counter, counter_up, counter_down;
 uint8_t taster_1_blocked;
+
+#define button_up 0
+#define button_down 1
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

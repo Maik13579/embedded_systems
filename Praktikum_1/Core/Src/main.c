@@ -311,10 +311,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim == &htim16){
 		uint8_t button_changed;
 
-		if(HAL_GPIO_ReadPin(Button_up_GPIO_Port, Button_up_Pin)) button_pin |= (1<<0);
-		else button_pin &= ~(1<<0);
-		if(HAL_GPIO_ReadPin(Button_down_GPIO_Port, Button_down_Pin)) button_pin |= (1<<1);
-		else button_pin &= ~(1<<1);
+		if(HAL_GPIO_ReadPin(Button_up_GPIO_Port, Button_up_Pin)) button_pin |= (1<<button_up);
+		else button_pin &= ~(1<<button_up);
+		if(HAL_GPIO_ReadPin(Button_down_GPIO_Port, Button_down_Pin)) button_pin |= (1<<button_down);
+		else button_pin &= ~(1<<button_down);
 
 		button_changed = button_state ^ button_pin; //bit = 1 -> button changed
 
@@ -326,23 +326,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		button_state ^= button_changed; //toggle state
 
 		//count how long button up is pressed in 10 ms
-		if(button_state & 0b00000001) counter_up++;
+		if(button_state & (1<<button_up)) counter_up++;
 
 		//count how long button down is pressed in 10 ms
-		if(button_state & 0b00000010) counter_down++;
+		if(button_state & (1<<button_down)) counter_down++;
 
-		if(~button_state & button_changed &0b00000001){// stopped pressing button up
+		if(~button_state & button_changed & (1<<button_up)){// stopped pressing button up
 			counter += (counter_up >= 100) ? 10 : 1; //increase counter with 10 if button is pressed longer than 1 sec, else increase 1
 			counter_up = 0; //reset counter
 		}
 
-		if(~button_state & button_changed &0b00000010){// stopped pressing button down
+		if(~button_state & button_changed & (1<<button_down)){// stopped pressing button down
 			counter -= (counter_down >= 100) ? 10 : 1; //decrease counter with 10 if button is pressed longer than 1 sec, else decrease 1
 			counter_down = 0; //reset counter
 		}
-
-
-
 
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
