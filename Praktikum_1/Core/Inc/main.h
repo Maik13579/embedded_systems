@@ -33,6 +33,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -76,6 +77,22 @@ void Error_Handler(void);
 #define LD2_GPIO_Port GPIOA
 #define LED_red_Pin GPIO_PIN_0
 #define LED_red_GPIO_Port GPIOB
+#define matrix_1_Pin GPIO_PIN_12
+#define matrix_1_GPIO_Port GPIOB
+#define matrix_2_Pin GPIO_PIN_13
+#define matrix_2_GPIO_Port GPIOB
+#define matrix_3_Pin GPIO_PIN_14
+#define matrix_3_GPIO_Port GPIOB
+#define matrix_4_Pin GPIO_PIN_15
+#define matrix_4_GPIO_Port GPIOB
+#define matrix_5_Pin GPIO_PIN_6
+#define matrix_5_GPIO_Port GPIOC
+#define matrix_6_Pin GPIO_PIN_7
+#define matrix_6_GPIO_Port GPIOC
+#define matrix_7_Pin GPIO_PIN_8
+#define matrix_7_GPIO_Port GPIOC
+#define matrix_8_Pin GPIO_PIN_9
+#define matrix_8_GPIO_Port GPIOC
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
