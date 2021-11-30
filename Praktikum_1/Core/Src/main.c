@@ -301,9 +301,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim == &htim16){
 		uint8_t button_changed;
 
-		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4)) button_pin |= (1<<0);
+		if(HAL_GPIO_ReadPin(Button_up_GPIO_Port, Button_up_Pin)) button_pin |= (1<<0);
 		else button_pin &= ~(1<<0);
-		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1)) button_pin |= (1<<1);
+		if(HAL_GPIO_ReadPin(Button_down_GPIO_Port, Button_down_Pin)) button_pin |= (1<<1);
 		else button_pin &= ~(1<<1);
 
 		button_changed = button_state ^ button_pin; //bit = 1 -> button changed
