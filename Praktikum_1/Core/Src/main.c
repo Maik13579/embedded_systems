@@ -309,9 +309,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 
 		button_changed = button_state ^ button_pin; //bit = 1 -> button changed
 
-		// count to 4 or reset if button_changed != 1	Round:1	|	2	|	3	|	4	|
-		counter0 = ~(counter0 & button_changed);			//0	|	1	|	0	|	1	|
-		counter1 = counter0 ^ (counter1 & button_changed);	//1	|	0	|	0	|	1	|
+		// count to 4 or reset if button_changed != 1	Round:1	|	2	|	3	|	4	||	5	|	6	|	7	|	8	|
+		counter0 = ~(counter0 & button_changed);			//0	|	1	|	0	|	1	||	0	|	1	|	0	|	1	|
+		counter1 = counter0 ^ (counter1 & button_changed);	//1	|	0	|	0	|	1	||	1	|	0	|	0	|	1	|
+		//counter2 = ~(counter1 ^ counter 2);				//	|		|		|		||		|		|		|		| TODO: toggle Bit if counter0 and counter1 == 0, reset with button changed
 
 		button_changed &= counter0 & counter1; //change button state only if timer rolls over!
 		button_state ^= button_changed; //toggle state
