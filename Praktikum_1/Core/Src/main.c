@@ -113,23 +113,6 @@ int main(void)
 	else HAL_GPIO_WritePin(LED_green_GPIO_Port, LED_green_Pin, GPIO_PIN_RESET);
 
 
-	//print matrix in terminal
-	uint8_t row1[35] = {'\0'};
-	sprintf(row1, "%1c %1c %1c %1c \r\n", 'O', 'O', 'O', 'O');
-	uint8_t row2[35] = {'\0'};
-	sprintf(row2, "%1c %1c %1c %1c \r\n", 'O', 'O', 'O', 'O');
-	uint8_t row3[35] = {'\0'};
-	sprintf(row3, "%1c %1c %1c %1c \r\n", 'O', 'O', 'O', 'O');
-	uint8_t row4[35] = {'\0'};
-	sprintf(row4, "%1c %1c %1c %1c \r\n\n\n", 'O', 'O', 'O', 'O');
-
-	HAL_UART_Transmit(&huart2, row1, sizeof(row1), 100);
-	HAL_UART_Transmit(&huart2, row2, sizeof(row2), 100);
-	HAL_UART_Transmit(&huart2, row3, sizeof(row3), 100);
-	HAL_UART_Transmit(&huart2, row4, sizeof(row4), 100);
-
-	HAL_Delay(2000);
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -317,7 +300,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : matrix_5_Pin matrix_6_Pin matrix_7_Pin matrix_8_Pin */
   GPIO_InitStruct.Pin = matrix_5_Pin|matrix_6_Pin|matrix_7_Pin|matrix_8_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 }
@@ -325,91 +308,10 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 /* USER CODE BEGIN 4 */
 
-uint16_t read_matrix(void){
-	uint16_t matrix = 0;
-		// 1----5---9---12
-		// |	|	|   |
-		// 2----6---10--13
-		// |	|	|   |
-		// 3----7---11--14
-		// |	|	|   |
-		// 4----8---12--15
-	//set 1 to High
-	HAL_GPIO_WritePin(matrix_1_GPIO_Port, matrix_1_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(matrix_2_GPIO_Port, matrix_2_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(matrix_3_GPIO_Port, matrix_3_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(matrix_4_GPIO_Port, matrix_4_Pin, GPIO_PIN_RESET);
-
-	//read pins 5 to 8
-	if(HAL_GPIO_ReadPin(matrix_5_GPIO_Port, matrix_5_Pin)) matrix |= (1<<0);
-	else matrix &= ~(1<<0);
-	if(HAL_GPIO_ReadPin(matrix_6_GPIO_Port, matrix_6_Pin)) matrix |= (1<<1);
-	else matrix &= ~(1<<1);
-	if(HAL_GPIO_ReadPin(matrix_7_GPIO_Port, matrix_7_Pin)) matrix |= (1<<2);
-	else matrix &= ~(1<<2);
-	if(HAL_GPIO_ReadPin(matrix_8_GPIO_Port, matrix_8_Pin)) matrix |= (1<<3);
-	else matrix &= ~(1<<3);
-
-	//set 2 to High
-	HAL_GPIO_WritePin(matrix_1_GPIO_Port, matrix_1_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(matrix_2_GPIO_Port, matrix_2_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(matrix_3_GPIO_Port, matrix_3_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(matrix_4_GPIO_Port, matrix_4_Pin, GPIO_PIN_RESET);
-
-	//read pins 5 to 8
-	if(HAL_GPIO_ReadPin(matrix_5_GPIO_Port, matrix_5_Pin)) matrix |= (1<<4);
-	else matrix &= ~(1<<4);
-	if(HAL_GPIO_ReadPin(matrix_6_GPIO_Port, matrix_6_Pin)) matrix |= (1<<5);
-	else matrix &= ~(1<<5);
-	if(HAL_GPIO_ReadPin(matrix_7_GPIO_Port, matrix_7_Pin)) matrix |= (1<<6);
-	else matrix &= ~(1<<6);
-	if(HAL_GPIO_ReadPin(matrix_8_GPIO_Port, matrix_8_Pin)) matrix |= (1<<7);
-	else matrix &= ~(1<<7);
-
-	//set 3 to High
-	HAL_GPIO_WritePin(matrix_1_GPIO_Port, matrix_1_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(matrix_2_GPIO_Port, matrix_2_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(matrix_3_GPIO_Port, matrix_3_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(matrix_4_GPIO_Port, matrix_4_Pin, GPIO_PIN_RESET);
-
-	//read pins 5 to 8
-	if(HAL_GPIO_ReadPin(matrix_5_GPIO_Port, matrix_5_Pin)) matrix |= (1<<8);
-	else matrix &= ~(1<<8);
-	if(HAL_GPIO_ReadPin(matrix_6_GPIO_Port, matrix_6_Pin)) matrix |= (1<<9);
-	else matrix &= ~(1<<9);
-	if(HAL_GPIO_ReadPin(matrix_7_GPIO_Port, matrix_7_Pin)) matrix |= (1<<10);
-	else matrix &= ~(1<<10);
-	if(HAL_GPIO_ReadPin(matrix_8_GPIO_Port, matrix_8_Pin)) matrix |= (1<<11);
-	else matrix &= ~(1<<11);
-
-	//set 4 to High
-	HAL_GPIO_WritePin(matrix_1_GPIO_Port, matrix_1_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(matrix_2_GPIO_Port, matrix_2_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(matrix_3_GPIO_Port, matrix_3_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(matrix_4_GPIO_Port, matrix_4_Pin, GPIO_PIN_SET);
-
-	//read pins 5 to 8
-	if(HAL_GPIO_ReadPin(matrix_5_GPIO_Port, matrix_5_Pin)) matrix |= (1<<12);
-	else matrix &= ~(1<<12);
-	if(HAL_GPIO_ReadPin(matrix_6_GPIO_Port, matrix_6_Pin)) matrix |= (1<<13);
-	else matrix &= ~(1<<13);
-	if(HAL_GPIO_ReadPin(matrix_7_GPIO_Port, matrix_7_Pin)) matrix |= (1<<14);
-	else matrix &= ~(1<<14);
-	if(HAL_GPIO_ReadPin(matrix_8_GPIO_Port, matrix_8_Pin)) matrix |= (1<<15);
-	else matrix &= ~(1<<15);
-
-	return matrix;
-}
-
-
 uint8_t button_state; //states for 8 buttons. bit = 1 -> button is pressed
 uint8_t counter0 =0xFF, counter1  =0xFF;//8 * two bit counter
 uint8_t button_pin; //pins for 8 buttons
 
-// same like above only for 4x4 button matrix
-uint16_t counter0_matrix =0xFF, counter1_matrix= 0xFF;
-uint16_t matrix_state;
-uint16_t matrix_pin;
 
 //Callback: timer has reset
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
@@ -447,30 +349,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		}
 
 
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////4X4 Button Matrix//////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		// 1	2	3	4
-		// |	|	|	|
-		// +----+---+---+-----5
-		// |	|	|	|
-		// +----+---+---+-----6
-		// |	|	|	|
-		// +----+---+---+-----7
-		// |	|	|	|
-		// +----+---+---+-----8
-		uint16_t matrix_changed;
-
-		//Todo: read matrix into matrix_pin
-		matrix_pin = read_matrix();
-
-		matrix_changed = matrix_state ^ matrix_pin;
-		counter0_matrix = ~(counter0_matrix & matrix_changed);
-		counter1_matrix = counter0_matrix ^ (counter1_matrix & matrix_changed);
-
-		matrix_changed &= counter0_matrix & counter1_matrix;
-		matrix_state ^= matrix_changed;
 
 	}
 
